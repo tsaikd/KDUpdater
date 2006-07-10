@@ -330,6 +330,14 @@
 				</File>
 			</Filter>
 		</Filter>
+		<File
+			RelativePath="..\ChangeLog.txt"
+			>
+		</File>
+		<File
+			RelativePath="..\TODO.txt"
+			>
+		</File>
 	</Files>
 	<Globals>
 		<Global

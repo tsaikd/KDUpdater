@@ -146,7 +146,7 @@ void CKDUpdaterDlg::OnBnClickedUpdtBtnCheck()
 {
 	if (m_list_File.IsNeedUpdate())
 		MessageBox(_T("Need to Update"));
-	else
+	else if (!m_list_File.IsDownloadFailed())
 		MessageBox(_T("No Need to Update"));
 }
 

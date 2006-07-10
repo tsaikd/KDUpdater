@@ -7,12 +7,12 @@ class CUPDTListItem
 {
 public:
 	CUPDTListItem() : m_uFileSize(0) {}
-	~CUPDTListItem() {}
+	virtual ~CUPDTListItem() {}
 
-	CString m_sFilePath;
-	CKDAppVer m_sVersion;
-	UINT m_uFileSize;
-	CString m_sFileURL;
+	CString		m_sFilePath;
+	CKDAppVer	m_sVersion;
+	UINT		m_uFileSize;
+	CString		m_sFileURL;
 };
 
 class CUPDTListCtrl : public CListCtrl, public CKDThread
@@ -22,24 +22,27 @@ public:
 	CUPDTListCtrl();
 	~CUPDTListCtrl();
 
-	void Init();
-	bool LoadSetting(LPCTSTR lpFilePath);
-	void SaveSetting(LPCTSTR lpFilePath);
-	void DoUpdate();
-	bool IsNeedUpdate(bool bPrepareDL = false);
+	void	Init();
+	bool	LoadSetting(LPCTSTR lpFilePath);
+	void	SaveSetting(LPCTSTR lpFilePath);
+	void	DoUpdate();
+	bool	IsNeedUpdate(bool bPrepareDL = false);
 
 	virtual DWORD ThreadProc();
 
-	bool AddItem();
-	void RemoveSelItem();
-	LPARAM GetFirstSelectedItemLParam();
-	int FindItemByText(LPCTSTR lpText);
+	bool	AddItem();
+	void	RemoveSelItem();
+	LPARAM	GetFirstSelectedItemLParam();
+	int		FindItemByText(LPCTSTR lpText);
+
+	inline bool IsDownloadFailed() { return m_bDownloadFailed; }
 
 private:
 	static BOOL CALLBACK QueryOtherKDUpdater(HWND hWnd, LPARAM lParam);
 
-	HWND m_hOtherKDUpdater;
-	CMutex m_muxUpdate;
+	bool	m_bDownloadFailed;
+	HWND	m_hOtherKDUpdater;
+	CMutex	m_muxUpdate;
 	CArray<CUPDTListItem> m_aDLItem;
 
 public:

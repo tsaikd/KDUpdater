@@ -1,2 +1,8 @@
+Version: 1.0.0.3	(2006-07-11)
+	Fix bug: when download list failed, program will crash
+
+Version: 1.0.0.2	(2006-07-10)
+	Rewrite a lot of codes
+
 Version: 1.0.0.1	(2006-07-09)
 	First release

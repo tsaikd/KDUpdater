@@ -8,7 +8,7 @@
 #include "UPDTListCtrl.h"
 
 CUPDTListCtrl::CUPDTListCtrl()
-	:	m_hOtherKDUpdater(NULL)
+	:	m_hOtherKDUpdater(NULL), m_bDownloadFailed(false)
 {
 }
 
@@ -143,7 +143,13 @@ bool CUPDTListCtrl::IsNeedUpdate(bool bPrepareDL/* = false*/)
 	if (sBuf.IsEmpty())
 		RETURN(false);
 
-	DownloadFileFromHttp(sBuf, sListIni);
+	TRY {
+		m_bDownloadFailed = false;
+		DownloadFileFromHttp(sBuf, sListIni);
+	} CATCH_ALL(e) {
+		m_bDownloadFailed = true;
+		e->ReportError();
+	} END_CATCH_ALL;
 	if (!PathFileExists(sListIni))
 		RETURN(false);
 

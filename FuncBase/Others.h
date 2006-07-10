@@ -92,6 +92,9 @@ int GetOnInternet(LPCSTR lpszTestHost = "www.google.com", u_short uTestPort = 80
 int GetOnOffline();
 #endif //defined(_WINSOCK2API_) && defined(_WININET_)
 
+bool ExplorerFile(LPCTSTR lpFilePath);
+bool ExplorerDir(LPCTSTR lpDirPath);
+
 class CGetFileVersion : public CString
 {
 public:
@@ -158,6 +161,3 @@ private:
 	LPCTSTR m_lpAppFileVer;
 	LPCTSTR m_lpAppProductVer;
 };
-
-bool ExplorerFile(LPCTSTR lpFilePath);
-bool ExplorerDir(LPCTSTR lpDirPath);
