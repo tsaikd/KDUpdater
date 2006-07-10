@@ -36,6 +36,9 @@ public:
 	int FindItemByText(LPCTSTR lpText);
 
 private:
+	static BOOL CALLBACK QueryOtherKDUpdater(HWND hWnd, LPARAM lParam);
+
+	HWND m_hOtherKDUpdater;
 	CMutex m_muxUpdate;
 	CArray<CUPDTListItem> m_aDLItem;
 

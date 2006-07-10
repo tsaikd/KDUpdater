@@ -8,6 +8,7 @@
 #include "UPDTListCtrl.h"
 
 CUPDTListCtrl::CUPDTListCtrl()
+	:	m_hOtherKDUpdater(NULL)
 {
 }
 
@@ -51,6 +52,20 @@ bool CUPDTListCtrl::LoadSetting(LPCTSTR lpFilePath)
 	DeleteAllItems();
 	ini.SetPathName(lpFilePath);
 
+	((CKDUpdaterDlg *)GetParent())->m_hRegWnd = (HWND)ini.GetUInt(_T("General"), _T("hRegWnd"), 0);
+	if (((CKDUpdaterDlg *)GetParent())->m_hRegWnd) {
+		EnumWindows(QueryOtherKDUpdater, (LPARAM)this);
+		if (m_hOtherKDUpdater) {
+			theApp.Quit();
+			return false;
+		}
+	}
+
+	// borrow sListURL for tmp
+	sListURL = ini.GetString(_T("General"), _T("sWorkDir"));
+	if (PathIsDirectory(sListURL))
+		SetCurrentDirectory(sListURL);
+
 	sListURL = ini.GetString(_T("General"), _T("sListURL"));
 	GetParent()->GetDlgItem(IDC_UPDT_EDIT_LISTURL)->SetWindowText(sListURL);
 
@@ -62,7 +77,7 @@ bool CUPDTListCtrl::LoadSetting(LPCTSTR lpFilePath)
 
 		pItem = new CUPDTListItem;
 		pItem->m_sFilePath = ini.GetString(saSections[i], _T("sFilePath"));
-		pItem->m_sVersion = ini.GetString(saSections[i], _T("sVersion"));
+		pItem->m_sVersion = (LPCTSTR)ini.GetString(saSections[i], _T("sVersion"));
 		pItem->m_uFileSize = ini.GetUInt(saSections[i], _T("uFileSize"), 0);
 		pItem->m_sFileURL = ini.GetString(saSections[i], _T("sFileURL"));
 		InsertItem(LVIF_PARAM | LVIF_TEXT | LVIF_IMAGE, GetItemCount(), LPSTR_TEXTCALLBACK, 0, 0,
@@ -85,6 +100,7 @@ void CUPDTListCtrl::SaveSetting(LPCTSTR lpFilePath)
 	// sSection for tmp
 	GetParent()->GetDlgItem(IDC_UPDT_EDIT_LISTURL)->GetWindowText(sSection);
 	ini.WriteString(_T("General"), _T("sListURL"), sSection);
+	ini.WriteString(_T("General"), _T("sWorkDir"), theApp.GetAppDir());
 
 	iCount = GetItemCount();
 	for (i=0 ; i<iCount ; i++) {
@@ -108,7 +124,7 @@ void CUPDTListCtrl::DoUpdate()
 		CreateThread();
 }
 
-#define RETURN(x) { if (PathFileExists(sListIni)){DeleteFile(sListIni);} GetParent()->GetDlgItem(IDC_UPDT_EDIT_LISTURL)->EnableWindow(TRUE); m_muxUpdate.Unlock(); return ((x)); }
+#define RETURN(x) { DeleteFile(sListIni); sListIni.Append(_T(".UTF8.bak")); DeleteFile(sListIni); GetParent()->GetDlgItem(IDC_UPDT_EDIT_LISTURL)->EnableWindow(TRUE); m_muxUpdate.Unlock(); return ((x)); }
 bool CUPDTListCtrl::IsNeedUpdate(bool bPrepareDL/* = false*/)
 {
 	if (0 != GetOnInternet())
@@ -144,6 +160,8 @@ bool CUPDTListCtrl::IsNeedUpdate(bool bPrepareDL/* = false*/)
 	iniList.SetPathName(sListIni);
 	iniList.GetSectionNames(&saSection);
 	iCount = saSection.GetCount();
+	if (iCount == 0)
+		RETURN(false);
 	for (i=0 ; i<iCount ; i++) {
 		if (saSection[i] == _T("General"))
 			continue;
@@ -228,15 +246,18 @@ DWORD CUPDTListCtrl::ThreadProc()
 		int i, iCount;
 		CString sBuf;
 		CString sUpdatePath;
+		CString sUpdateDir;
+		GetCurrentDirectory(MAX_PATH, sUpdateDir.GetBuffer(MAX_PATH));
+		sUpdateDir.ReleaseBuffer();
 
 		m_muxUpdate.Lock();
 		iCount = m_aDLItem.GetCount();
 		for (i=0 ; i<iCount ; i++) {
-			sUpdatePath.Format(_T("%s%s"), theApp.GetAppDir(), m_aDLItem[i].m_sFilePath);
+			sUpdatePath.Format(_T("%s\\%s"), sUpdateDir, m_aDLItem[i].m_sFilePath);
 			sBuf = sUpdatePath + _T(".tmp");
 			if (DownloadFileFromHttp(m_aDLItem[i].m_sFileURL, sBuf)) {
 				// Update to new file
-				MoveFileEx(sUpdatePath, sBuf, MOVEFILE_REPLACE_EXISTING);
+				MoveFileEx(sBuf, sUpdatePath, MOVEFILE_REPLACE_EXISTING);
 			} else {
 				// Download failed
 			}
@@ -339,6 +360,29 @@ int CUPDTListCtrl::FindItemByText(LPCTSTR lpText)
 	itemInfo.flags = LVFI_STRING;
 	itemInfo.psz = lpText;
 	return FindItem(&itemInfo);
+}
+
+BOOL CALLBACK CUPDTListCtrl::QueryOtherKDUpdater(HWND hWnd, LPARAM lParam) {
+	DWORD dwMsgResult;
+	CUPDTListCtrl *pThis = (CUPDTListCtrl *)lParam;
+	if (!pThis)
+		return TRUE;
+
+	if (hWnd == theApp.m_pMainWnd->GetSafeHwnd())
+		return TRUE;
+
+	LRESULT res = ::SendMessageTimeout(hWnd, WMU_KDUPDATER_REQ, (WPARAM)((CKDUpdaterDlg *)pThis->GetParent())->m_hRegWnd,
+		0, SMTO_BLOCK | SMTO_ABORTIFHUNG, 1000, &dwMsgResult);
+
+	if (res == 0)
+		return TRUE;
+
+	if (dwMsgResult == WMU_KDUPDATER_RES) {
+		pThis->m_hOtherKDUpdater = hWnd; 
+		return FALSE;
+	}
+
+	return TRUE; 
 }
 
 BEGIN_MESSAGE_MAP(CUPDTListCtrl, CListCtrl)

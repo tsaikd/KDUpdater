@@ -1,18 +1,58 @@
 #include "StdAfx.h"
 #include "KDAppVer.h"
 
-CKDAppVer::CKDAppVer()
-{
-}
-
-CKDAppVer::~CKDAppVer()
-{
-}
-
 bool CKDAppVer::operator > (const CKDAppVer& ver)
 {
-	CString sVer1(GetString());
-	CString sVer2(ver);
+	if (_CmpVer(GetString(), ver) > 0)
+		return true;
+
+	return false;
+}
+
+bool CKDAppVer::operator >= (const CKDAppVer& ver)
+{
+	if (_CmpVer(GetString(), ver) >= 0)
+		return true;
+
+	return false;
+}
+
+bool CKDAppVer::operator == (const CKDAppVer& ver)
+{
+	if (_CmpVer(GetString(), ver) == 0)
+		return true;
+
+	return false;
+}
+
+bool CKDAppVer::operator != (const CKDAppVer& ver)
+{
+	if (_CmpVer(GetString(), ver) != 0)
+		return true;
+
+	return false;
+}
+
+bool CKDAppVer::operator < (const CKDAppVer& ver)
+{
+	if (_CmpVer(GetString(), ver) < 0)
+		return true;
+
+	return false;
+}
+
+bool CKDAppVer::operator <= (const CKDAppVer& ver)
+{
+	if (_CmpVer(GetString(), ver) <= 0)
+		return true;
+
+	return false;
+}
+
+int CKDAppVer::_CmpVer(LPCTSTR lpVer1, LPCTSTR lpVer2)
+{
+	CString sVer1(lpVer1);
+	CString sVer2(lpVer2);
 	CString sBuf1, sBuf2;
 	int iBuf1 = 0, iBuf2 = 0;
 	int iPos1 = 0, iPos2 = 0;
@@ -26,19 +66,31 @@ bool CKDAppVer::operator > (const CKDAppVer& ver)
 		if (sBuf1.IsEmpty() || sBuf2.IsEmpty())
 			break;
 
-		iBuf1 = _ttoi(sBuf1);
-		iBuf2 = _ttoi(sBuf2);
+		if (sBuf1.GetAt(0) >= _T('a')) {
+			iBuf1 = sBuf1.GetAt(0) - _T('a') + 10;
+		} else if (sBuf1.GetAt(0) >= _T('A')) {
+			iBuf1 = sBuf1.GetAt(0) - _T('A') + 10;
+		} else {
+			iBuf1 = _ttoi(sBuf1);
+		}
+		if (sBuf2.GetAt(0) >= _T('a')) {
+			iBuf2 = sBuf2.GetAt(0) - _T('a') + 10;
+		} else if (sBuf2.GetAt(0) >= _T('A')) {
+			iBuf2 = sBuf2.GetAt(0) - _T('A') + 10;
+		} else {
+			iBuf2 = _ttoi(sBuf2);
+		}
 
 		if (iBuf1 > iBuf2)
-			return true;
+			return 1;
 		if (iBuf1 < iBuf2)
-			return false;
+			return -1;
 	}
 
 	if (!sBuf1.IsEmpty())
-		return true;
+		return 1;
 	if (!sBuf2.IsEmpty())
-		return false;
+		return -1;
 
-	return false;
+	return 0;
 }

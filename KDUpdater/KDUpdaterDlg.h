@@ -1,6 +1,16 @@
 #pragma once
 #include "UPDTListCtrl.h"
 
+extern UINT WMU_KDUPDATER_REQ;
+extern UINT WMU_KDUPDATER_RES;
+
+extern UINT WMU_KDUPDATER_REQ_NEED_UPDATE;
+extern UINT WMU_KDUPDATER_RES_NEED_UPDATE;
+extern UINT WMU_KDUPDATER_RES_NONEED_UPDATE;
+
+extern UINT WMU_KDUPDATER_REQ_START_UPDATE;
+extern UINT WMU_KDUPDATER_REQ_CLOSE_APP;
+
 enum {
 	KDUPM_UPDATEOVER	= WM_USER + 1
 };
@@ -10,10 +20,10 @@ class CKDUpdaterDlg : public CDialog
 	DECLARE_MESSAGE_MAP()
 public:
 	enum { IDD = IDD_KDUPDATER_DIALOG };
-public:
 	CKDUpdaterDlg(CWnd* pParent = NULL);	// standard constructor
 
 	CUPDTListCtrl m_list_File;
+	HWND m_hRegWnd;
 
 private:
 	bool m_bVisiable;
