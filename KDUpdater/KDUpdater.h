@@ -5,7 +5,7 @@
 #endif
 
 #include "resource.h"		// main symbols
-#include "../KDClass/KDApp.h"
+#include "KDApp.h"
 
 class CKDUpdaterApp : public CWinApp, public CKDApp
 {

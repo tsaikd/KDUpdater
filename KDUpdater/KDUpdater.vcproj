@@ -44,6 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="$(SolutionDir)\FuncBase;$(SolutionDir)\KDClass"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -132,6 +133,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				EnableFiberSafeOptimizations="true"
+				AdditionalIncludeDirectories="$(SolutionDir)\FuncBase;$(SolutionDir)\KDClass"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -214,6 +216,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\UPDTEdit.h"
+				>
+			</File>
+			<File
 				RelativePath=".\UPDTListCtrl.h"
 				>
 			</File>
@@ -242,6 +248,10 @@
 				</File>
 				<File
 					RelativePath="..\FuncBase\Others.h"
+					>
+				</File>
+				<File
+					RelativePath="..\FuncBase\SHA.h"
 					>
 				</File>
 			</Filter>
@@ -298,6 +308,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\UPDTEdit.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\UPDTListCtrl.cpp"
 				>
 			</File>
@@ -327,6 +341,32 @@
 				<File
 					RelativePath="..\FuncBase\Others.cpp"
 					>
+				</File>
+				<File
+					RelativePath="..\FuncBase\SHA.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\FuncBase\SHA_asm.asm"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="ml.exe /c /Cx /coff /Fo $(IntDir)\ &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+							Outputs="$(IntDir)\$(InputName).obj"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="ml.exe /c /Cx /coff /Fo $(IntDir)\ &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+							Outputs="$(IntDir)\$(InputName).obj"
+						/>
+					</FileConfiguration>
 				</File>
 			</Filter>
 		</Filter>

@@ -1,3 +1,8 @@
+Version: 1.0.0.4	(2006-07-11)
+	Add support for SHA1 hash
+	Add support for dragging setting to import and fill up some information
+	Add support for optional file
+
 Version: 1.0.0.3	(2006-07-11)
 	Fix bug: when download list failed, program will crash
 

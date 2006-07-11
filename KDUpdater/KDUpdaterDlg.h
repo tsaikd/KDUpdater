@@ -1,5 +1,6 @@
 #pragma once
 #include "UPDTListCtrl.h"
+#include "UPDTEdit.h"
 
 extern UINT WMU_KDUPDATER_REQ;
 extern UINT WMU_KDUPDATER_RES;
@@ -23,6 +24,9 @@ public:
 	CKDUpdaterDlg(CWnd* pParent = NULL);	// standard constructor
 
 	CUPDTListCtrl m_list_File;
+	CUPDTEdit m_edit_Version;
+	CUPDTEdit m_edit_FileSize;
+	CUPDTEdit m_edit_SHA1Hash;
 	HWND m_hRegWnd;
 
 private:
@@ -34,6 +38,7 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 	virtual BOOL OnInitDialog();
 	afx_msg void OnPaint();
+	virtual void OnOK();
 	afx_msg HCURSOR OnQueryDragIcon();
 	virtual LRESULT DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -46,6 +51,5 @@ public:
 	afx_msg void OnBnClickedUpdtBtnUpdate();
 	afx_msg void OnBnClickedUpdtBtnCheck();
 	afx_msg void OnWindowPosChanging(WINDOWPOS* lpwndpos);
-protected:
-	virtual void OnOK();
+	afx_msg void OnDropFiles(HDROP hDropInfo);
 };

@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "../FuncBase/Ini.h"
+#include "Ini.h"
 #include "KDUpdater.h"
 #include "KDUpdaterDlg.h"
 
@@ -62,12 +62,16 @@ BEGIN_MESSAGE_MAP(CKDUpdaterDlg, CDialog)
 	ON_BN_CLICKED(IDC_UPDT_BTN_UPDATE, &CKDUpdaterDlg::OnBnClickedUpdtBtnUpdate)
 	ON_BN_CLICKED(IDC_UPDT_BTN_CHECK, &CKDUpdaterDlg::OnBnClickedUpdtBtnCheck)
 	ON_WM_WINDOWPOSCHANGING()
+	ON_WM_DROPFILES()
 END_MESSAGE_MAP()
 
 void CKDUpdaterDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_UPDT_LIST_FILE, m_list_File);
+	DDX_Control(pDX, IDC_UPDT_EDIT_VERSION, m_edit_Version);
+	DDX_Control(pDX, IDC_UPDT_EDIT_FILESIZE, m_edit_FileSize);
+	DDX_Control(pDX, IDC_UPDT_EDIT_SHA1HASH, m_edit_SHA1Hash);
 }
 
 // If you add a minimize button to your dialog, you will need the code below
@@ -180,6 +184,23 @@ void CKDUpdaterDlg::OnOK()
 	}
 
 //	CDialog::OnOK();
+}
+
+void CKDUpdaterDlg::OnDropFiles(HDROP hDropInfo)
+{
+	TCHAR sFilePath[MAX_PATH];
+	UINT i, uCount = DragQueryFile(hDropInfo, UINT_MAX, NULL, 0);
+
+	for (i = 0;i< uCount;i++) {
+		DragQueryFile(hDropInfo, i, sFilePath, MAX_PATH);
+
+		if (PathFileExists(sFilePath)) {
+			m_list_File.LoadSetting(sFilePath);
+			break;
+		}
+	}
+
+	CDialog::OnDropFiles(hDropInfo);
 }
 
 LRESULT CKDUpdaterDlg::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)

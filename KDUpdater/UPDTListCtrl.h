@@ -1,18 +1,22 @@
 #pragma once
 #include "afxcmn.h"
-#include "../KDClass/KDThread.h"
-#include "../KDClass/KDAppVer.h"
+#include "KDThread.h"
+#include "KDAppVer.h"
+
+#define DEFAULT_UPDT_LISTITEM_BOPTIONAL FALSE
 
 class CUPDTListItem
 {
 public:
-	CUPDTListItem() : m_uFileSize(0) {}
+	CUPDTListItem() : m_uFileSize(0), m_bOptional(DEFAULT_UPDT_LISTITEM_BOPTIONAL) {}
 	virtual ~CUPDTListItem() {}
 
 	CString		m_sFilePath;
 	CKDAppVer	m_sVersion;
 	UINT		m_uFileSize;
 	CString		m_sFileURL;
+	CString		m_sSha1Hash;
+	BOOL		m_bOptional;
 };
 
 class CUPDTListCtrl : public CListCtrl, public CKDThread
@@ -44,6 +48,11 @@ private:
 	HWND	m_hOtherKDUpdater;
 	CMutex	m_muxUpdate;
 	CArray<CUPDTListItem> m_aDLItem;
+
+	// Hide information
+	UINT	m_uhRegWnd;
+	CString	m_sWorkDir;
+	CString	m_sPostCmd;
 
 public:
 	afx_msg void OnDestroy();

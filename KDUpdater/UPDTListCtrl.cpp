@@ -1,14 +1,15 @@
 #include "StdAfx.h"
 #include "Resource.h"
-#include "../FuncBase/Ini.h"
-#include "../FuncBase/Others.h"
+#include "Ini.h"
+#include "Others.h"
+#include "SHA.h"
 #include "KDUpdater.h"
 #include "KDUpdaterDlg.h"
 
 #include "UPDTListCtrl.h"
 
 CUPDTListCtrl::CUPDTListCtrl()
-	:	m_hOtherKDUpdater(NULL), m_bDownloadFailed(false)
+	:	m_hOtherKDUpdater(NULL), m_bDownloadFailed(false), m_uhRegWnd(0)
 {
 }
 
@@ -61,11 +62,14 @@ bool CUPDTListCtrl::LoadSetting(LPCTSTR lpFilePath)
 		}
 	}
 
-	// borrow sListURL for tmp
-	sListURL = ini.GetString(_T("General"), _T("sWorkDir"));
-	if (PathIsDirectory(sListURL))
-		SetCurrentDirectory(sListURL);
+	// Load hide information
+	m_uhRegWnd = ini.GetUInt(_T("General"), _T("hRegWnd"), 0);
+	m_sWorkDir = ini.GetString(_T("General"), _T("sWorkDir"));
+	if (!m_sWorkDir.IsEmpty() && PathIsDirectory(m_sWorkDir))
+		SetCurrentDirectory(m_sWorkDir);
+	m_sPostCmd = ini.GetString(_T("General"), _T("sPostCmd"));
 
+	// Load other information
 	sListURL = ini.GetString(_T("General"), _T("sListURL"));
 	GetParent()->GetDlgItem(IDC_UPDT_EDIT_LISTURL)->SetWindowText(sListURL);
 
@@ -76,10 +80,13 @@ bool CUPDTListCtrl::LoadSetting(LPCTSTR lpFilePath)
 			continue;
 
 		pItem = new CUPDTListItem;
-		pItem->m_sFilePath = ini.GetString(saSections[i], _T("sFilePath"));
-		pItem->m_sVersion = (LPCTSTR)ini.GetString(saSections[i], _T("sVersion"));
-		pItem->m_uFileSize = ini.GetUInt(saSections[i], _T("uFileSize"), 0);
-		pItem->m_sFileURL = ini.GetString(saSections[i], _T("sFileURL"));
+		pItem->m_sFilePath	= ini.GetString(saSections[i], _T("sFilePath"));
+		pItem->m_sVersion	= ini.GetString(saSections[i], _T("sVersion"));
+		pItem->m_uFileSize	= ini.GetUInt(saSections[i], _T("uFileSize"), 0);
+		pItem->m_sFileURL	= ini.GetString(saSections[i], _T("sFileURL"));
+		pItem->m_sSha1Hash	= ini.GetString(saSections[i], _T("sSha1Hash"));
+		pItem->m_bOptional	= ini.GetBool(saSections[i], _T("bOptional"), DEFAULT_UPDT_LISTITEM_BOPTIONAL);
+
 		InsertItem(LVIF_PARAM | LVIF_TEXT | LVIF_IMAGE, GetItemCount(), LPSTR_TEXTCALLBACK, 0, 0,
 			I_IMAGECALLBACK, (LPARAM) pItem);
 	}
@@ -97,10 +104,17 @@ void CUPDTListCtrl::SaveSetting(LPCTSTR lpFilePath)
 		DeleteFile(lpFilePath);
 	ini.SetPathName(lpFilePath);
 
+	// Save hide information
+	if (!m_uhRegWnd)
+		ini.WriteUInt(_T("General"), _T("hRegWnd"), m_uhRegWnd);
+	if (!m_sWorkDir.IsEmpty())
+		ini.WriteString(_T("General"), _T("sWorkDir"), m_sWorkDir);
+	if (!m_sPostCmd.IsEmpty())
+		ini.WriteString(_T("General"), _T("sPostCmd"), m_sPostCmd);
+
 	// sSection for tmp
 	GetParent()->GetDlgItem(IDC_UPDT_EDIT_LISTURL)->GetWindowText(sSection);
 	ini.WriteString(_T("General"), _T("sListURL"), sSection);
-	ini.WriteString(_T("General"), _T("sWorkDir"), theApp.GetAppDir());
 
 	iCount = GetItemCount();
 	for (i=0 ; i<iCount ; i++) {
@@ -115,6 +129,10 @@ void CUPDTListCtrl::SaveSetting(LPCTSTR lpFilePath)
 			ini.WriteUInt(sSection, _T("uFileSize"), pItem->m_uFileSize);
 		if (!pItem->m_sFileURL.IsEmpty())
 			ini.WriteString(sSection, _T("sFileURL"), pItem->m_sFileURL);
+		if (!pItem->m_sSha1Hash.IsEmpty())
+			ini.WriteString(sSection, _T("sSha1Hash"), pItem->m_sSha1Hash);
+		if (pItem->m_bOptional != DEFAULT_UPDT_LISTITEM_BOPTIONAL)
+			ini.WriteBool(sSection, _T("bOptional"), pItem->m_bOptional);
 	}
 }
 
@@ -172,11 +190,13 @@ bool CUPDTListCtrl::IsNeedUpdate(bool bPrepareDL/* = false*/)
 		if (saSection[i] == _T("General"))
 			continue;
 
-		item.m_sFilePath = iniList.GetString(saSection[i], _T("sFilePath"));
+		item.m_sFilePath	= iniList.GetString(saSection[i], _T("sFilePath"));
 		saFilePath.Add(item.m_sFilePath);
-		item.m_sVersion = iniList.GetString(saSection[i], _T("sVersion"));
-		item.m_uFileSize = iniList.GetUInt(saSection[i], _T("uFileSize"), 0);
-		item.m_sFileURL = iniList.GetString(saSection[i], _T("sFileURL"));
+		item.m_sVersion		= iniList.GetString(saSection[i], _T("sVersion"));
+		item.m_uFileSize	= iniList.GetUInt(saSection[i], _T("uFileSize"), 0);
+		item.m_sFileURL		= iniList.GetString(saSection[i], _T("sFileURL"));
+		item.m_sSha1Hash	= iniList.GetString(saSection[i], _T("sSha1Hash"));
+		item.m_bOptional	= iniList.GetBool(saSection[i], _T("bOptional"), DEFAULT_UPDT_LISTITEM_BOPTIONAL);
 
 		aItem.Add(item);
 	}
@@ -209,7 +229,7 @@ bool CUPDTListCtrl::IsNeedUpdate(bool bPrepareDL/* = false*/)
 					RETURN(true);
 			}
 			aLocalItem.RemoveAt(j);
-		} else {
+		} else if (aItem[i].m_bOptional != TRUE) {
 			// The file is not in local Filelist, need to download
 			if (bPrepareDL)
 				m_aDLItem.Add(aItem[i]);
@@ -250,6 +270,8 @@ DWORD CUPDTListCtrl::ThreadProc()
 
 	if (IsNeedUpdate(true)) {
 		int i, iCount;
+		CSHA sha;
+		CString sSha1Hash;
 		CString sBuf;
 		CString sUpdatePath;
 		CString sUpdateDir;
@@ -260,12 +282,35 @@ DWORD CUPDTListCtrl::ThreadProc()
 		iCount = m_aDLItem.GetCount();
 		for (i=0 ; i<iCount ; i++) {
 			sUpdatePath.Format(_T("%s\\%s"), sUpdateDir, m_aDLItem[i].m_sFilePath);
+			sUpdatePath.Replace(_T("/"), _T("\\"));
+
+			sBuf = sUpdatePath;
+			PathRemoveFileSpec(sBuf.GetBuffer());
+			sBuf.ReleaseBuffer();
+			if (!sBuf.IsEmpty() && !PathFileExists(sBuf))
+				SHCreateDirectoryEx(NULL, sBuf, NULL);
+
 			sBuf = sUpdatePath + _T(".tmp");
 			if (DownloadFileFromHttp(m_aDLItem[i].m_sFileURL, sBuf)) {
 				// Update to new file
+				if (!m_aDLItem[i].m_sSha1Hash.IsEmpty()) {
+					m_aDLItem[i].m_sSha1Hash.MakeUpper();
+					sSha1Hash = sha.GetHashStringFromFile(sBuf, TRUE);
+					if ((sSha1Hash != m_aDLItem[i].m_sSha1Hash) &&
+						(IDYES == MessageBox(_T("The SHA1 checksum error!\nDo you want to download again?"),
+						NULL, MB_YESNO | MB_ICONERROR))) {
+						i--;
+						continue;
+					}
+				}
 				MoveFileEx(sBuf, sUpdatePath, MOVEFILE_REPLACE_EXISTING);
 			} else {
 				// Download failed
+				sBuf.Format(_T("%s\nThe file download failed!\nDo you want to try again?"), m_aDLItem[i].m_sFileURL);
+				if (IDYES == MessageBox(sBuf, NULL, MB_YESNO | MB_ICONERROR)) {
+					i--;
+					continue;
+				}
 			}
 		}
 		m_muxUpdate.Unlock();
@@ -309,11 +354,6 @@ bool CUPDTListCtrl::AddItem()
 		delete pItem;
 		return false;
 	}
-	int iTmp = FindItemByText(sBuf);
-	if (iTmp >= 0) {
-		iPos = iTmp;
-		DeleteItem(iPos);
-	}
 	pItem->m_sFilePath = sBuf;
 
 	pWnd = GetParent()->GetDlgItem(IDC_UPDT_EDIT_VERSION);
@@ -336,6 +376,20 @@ bool CUPDTListCtrl::AddItem()
 	if (!sBuf.IsEmpty())
 		pItem->m_sFileURL = sBuf;
 
+	pWnd = GetParent()->GetDlgItem(IDC_UPDT_EDIT_SHA1HASH);
+	pWnd->GetWindowText(sBuf);
+	if (!sBuf.IsEmpty())
+		pItem->m_sSha1Hash = sBuf;
+
+	pWnd = GetParent()->GetDlgItem(IDC_UPDT_CHECK_OPTIONAL);
+	if (((CButton *)pWnd)->GetCheck() == BST_CHECKED)
+		pItem->m_bOptional = TRUE;
+
+	int iTmp = FindItemByText(pItem->m_sFilePath);
+	if (iTmp >= 0) {
+		iPos = iTmp;
+		DeleteItem(iPos);
+	}
 	iRes = InsertItem(LVIF_PARAM | LVIF_TEXT | LVIF_IMAGE, iPos, LPSTR_TEXTCALLBACK, 0, 0,
 		I_IMAGECALLBACK, (LPARAM) pItem);
 	if (iRes == -1) {
@@ -439,11 +493,15 @@ void CUPDTListCtrl::OnLvnItemchanged(NMHDR *pNMHDR, LRESULT *pResult)
 			GetParent()->GetDlgItem(IDC_UPDT_EDIT_FILESIZE)->SetWindowText(_T("0"));
 		}
 		GetParent()->GetDlgItem(IDC_UPDT_EDIT_FILEURL)->SetWindowText(pItem->m_sFileURL);
+		GetParent()->GetDlgItem(IDC_UPDT_EDIT_SHA1HASH)->SetWindowText(pItem->m_sSha1Hash);
+		((CButton *)GetParent()->GetDlgItem(IDC_UPDT_CHECK_OPTIONAL))->SetCheck(pItem->m_bOptional ? BST_CHECKED : BST_UNCHECKED);
 	} else {
 		GetParent()->GetDlgItem(IDC_UPDT_EDIT_FILEPATH)->SetWindowText(_T(""));
 		GetParent()->GetDlgItem(IDC_UPDT_EDIT_VERSION)->SetWindowText(_T(""));
 		GetParent()->GetDlgItem(IDC_UPDT_EDIT_FILESIZE)->SetWindowText(_T("0"));
 		GetParent()->GetDlgItem(IDC_UPDT_EDIT_FILEURL)->SetWindowText(_T(""));
+		GetParent()->GetDlgItem(IDC_UPDT_EDIT_SHA1HASH)->SetWindowText(_T(""));
+		((CButton *)GetParent()->GetDlgItem(IDC_UPDT_CHECK_OPTIONAL))->SetCheck(DEFAULT_UPDT_LISTITEM_BOPTIONAL ? BST_CHECKED : BST_UNCHECKED);
 	}
 
 	*pResult = 0;
