@@ -195,86 +195,6 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
-			<File
-				RelativePath=".\KDUpdater.h"
-				>
-			</File>
-			<File
-				RelativePath=".\KDUpdaterDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Resource.h"
-				>
-			</File>
-			<File
-				RelativePath=".\stdafx.h"
-				>
-			</File>
-			<File
-				RelativePath=".\UPDTEdit.h"
-				>
-			</File>
-			<File
-				RelativePath=".\UPDTListCtrl.h"
-				>
-			</File>
-			<Filter
-				Name="KDClass"
-				>
-				<File
-					RelativePath="..\KDClass\KDApp.h"
-					>
-				</File>
-				<File
-					RelativePath="..\KDClass\KDAppVer.h"
-					>
-				</File>
-				<File
-					RelativePath="..\KDClass\KDThread.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="FuncBase"
-				>
-				<File
-					RelativePath="..\FuncBase\Ini.h"
-					>
-				</File>
-				<File
-					RelativePath="..\FuncBase\Others.h"
-					>
-				</File>
-				<File
-					RelativePath="..\FuncBase\SHA.h"
-					>
-				</File>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
-			<File
-				RelativePath=".\res\KDUpdater.ico"
-				>
-			</File>
-			<File
-				RelativePath=".\KDUpdater.rc"
-				>
-			</File>
-			<File
-				RelativePath=".\res\KDUpdater.rc2"
-				>
-			</File>
-		</Filter>
-		<Filter
 			Name="Source Files"
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
@@ -369,6 +289,86 @@
 					</FileConfiguration>
 				</File>
 			</Filter>
+		</Filter>
+		<Filter
+			Name="Header Files"
+			Filter="h;hpp;hxx;hm;inl;inc;xsd"
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
+			>
+			<File
+				RelativePath=".\KDUpdater.h"
+				>
+			</File>
+			<File
+				RelativePath=".\KDUpdaterDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Resource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UPDTEdit.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UPDTListCtrl.h"
+				>
+			</File>
+			<Filter
+				Name="KDClass"
+				>
+				<File
+					RelativePath="..\KDClass\KDApp.h"
+					>
+				</File>
+				<File
+					RelativePath="..\KDClass\KDAppVer.h"
+					>
+				</File>
+				<File
+					RelativePath="..\KDClass\KDThread.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="FuncBase"
+				>
+				<File
+					RelativePath="..\FuncBase\Ini.h"
+					>
+				</File>
+				<File
+					RelativePath="..\FuncBase\Others.h"
+					>
+				</File>
+				<File
+					RelativePath="..\FuncBase\SHA.h"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Resource Files"
+			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
+			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
+			>
+			<File
+				RelativePath=".\res\KDUpdater.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\KDUpdater.rc"
+				>
+			</File>
+			<File
+				RelativePath=".\res\KDUpdater.rc2"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath="..\ChangeLog.txt"
