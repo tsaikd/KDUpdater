@@ -1,3 +1,6 @@
+Version: 1.0.0.5	(2006-07-12)
+	Fix bug: Can't export hRegWnd to setting file
+
 Version: 1.0.0.4	(2006-07-11)
 	Add support for SHA1 hash
 	Add support for dragging setting to import and fill up some information

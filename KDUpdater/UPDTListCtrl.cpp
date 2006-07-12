@@ -105,7 +105,7 @@ void CUPDTListCtrl::SaveSetting(LPCTSTR lpFilePath)
 	ini.SetPathName(lpFilePath);
 
 	// Save hide information
-	if (!m_uhRegWnd)
+	if (m_uhRegWnd)
 		ini.WriteUInt(_T("General"), _T("hRegWnd"), m_uhRegWnd);
 	if (!m_sWorkDir.IsEmpty())
 		ini.WriteString(_T("General"), _T("sWorkDir"), m_sWorkDir);
