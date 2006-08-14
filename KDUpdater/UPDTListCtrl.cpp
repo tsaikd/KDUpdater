@@ -228,13 +228,19 @@ bool CUPDTListCtrl::IsNeedUpdate(bool bPrepareDL/* = false*/)
 				else
 					RETURN(true);
 			} else if (aItem[i].m_sVersion == pItem->m_sVersion) {
-				if ((!pItem->m_sSha1Hash.IsEmpty()) &&
-					(!aItem[i].m_sSha1Hash.IsEmpty()) &&
-					(aItem[i].m_sSha1Hash != pItem->m_sSha1Hash)) {
-					if (bPrepareDL)
-						m_aDLItem.Add(aItem[i]);
-					else
-						RETURN(true);
+				if (!aItem[i].m_sSha1Hash.IsEmpty()) {
+					if (pItem->m_sSha1Hash.IsEmpty()) {
+						if (PathFileExists(pItem->m_sFilePath)) {
+							CSHA sha;
+							pItem->m_sSha1Hash = sha.GetHashStringFromFile(pItem->m_sFilePath, TRUE);
+						}
+					}
+					if ((!pItem->m_sSha1Hash.IsEmpty()) && (aItem[i].m_sSha1Hash != pItem->m_sSha1Hash)) {
+						if (bPrepareDL)
+							m_aDLItem.Add(aItem[i]);
+						else
+							RETURN(true);
+					}
 				}
 			}
 			aLocalItem.RemoveAt(j);
