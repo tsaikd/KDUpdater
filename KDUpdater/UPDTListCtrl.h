@@ -41,6 +41,8 @@ public:
 
 	inline bool IsDownloadFailed() { return m_bDownloadFailed; }
 
+	bool	m_bNeedRevert;
+
 private:
 	static BOOL CALLBACK QueryOtherKDUpdater(HWND hWnd, LPARAM lParam);
 

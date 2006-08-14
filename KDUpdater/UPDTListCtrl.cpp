@@ -9,7 +9,7 @@
 #include "UPDTListCtrl.h"
 
 CUPDTListCtrl::CUPDTListCtrl()
-	:	m_hOtherKDUpdater(NULL), m_bDownloadFailed(false), m_uhRegWnd(0)
+	:	m_hOtherKDUpdater(NULL), m_bDownloadFailed(false), m_uhRegWnd(0), m_bNeedRevert(false)
 {
 }
 
@@ -171,6 +171,7 @@ bool CUPDTListCtrl::IsNeedUpdate(bool bPrepareDL/* = false*/)
 	if (!PathFileExists(sListIni))
 		RETURN(false);
 
+	m_bNeedRevert = false;
 	int i, iCount;
 	int j, jCount;
 	CIni iniList;
@@ -239,7 +240,7 @@ bool CUPDTListCtrl::IsNeedUpdate(bool bPrepareDL/* = false*/)
 						if (bPrepareDL)
 							m_aDLItem.Add(aItem[i]);
 						else
-							RETURN(true);
+							m_bNeedRevert = true;
 					}
 				}
 			}
@@ -268,7 +269,7 @@ bool CUPDTListCtrl::IsNeedUpdate(bool bPrepareDL/* = false*/)
 			RETURN(true);
 	}
 
-	RETURN(false);
+	RETURN(m_bNeedRevert);
 }
 #undef RETURN
 

@@ -12,7 +12,7 @@ UINT WMU_KDUPDATER_RES					= RegisterWindowMessage(_T("Res") _T("KDUpdater"));
 
 UINT WMU_KDUPDATER_REQ_NEED_UPDATE		= RegisterWindowMessage(_T("Req") _T("KDUpdater Need Update"));
 UINT WMU_KDUPDATER_RES_NEED_UPDATE		= RegisterWindowMessage(_T("Res") _T("KDUpdater Need Update"));
-UINT WMU_KDUPDATER_RES_NONEED_UPDATE	= RegisterWindowMessage(_T("Res") _T("KDUpdater No Need Update"));
+UINT WMU_KDUPDATER_RES_NEED_REVERT		= RegisterWindowMessage(_T("Res") _T("KDUpdater Need Revert"));
 
 UINT WMU_KDUPDATER_REQ_START_UPDATE		= RegisterWindowMessage(_T("Req") _T("KDUpdater Start Update"));
 UINT WMU_KDUPDATER_REQ_CLOSE_APP		= RegisterWindowMessage(_T("Req") _T("KDUpdater Close App"));
@@ -212,10 +212,14 @@ LRESULT CKDUpdaterDlg::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			return 0;
 		}
 	} else if (message == WMU_KDUPDATER_REQ_NEED_UPDATE) {
-		if (m_list_File.IsNeedUpdate())
-			return WMU_KDUPDATER_RES_NEED_UPDATE;
-		else
-			return WMU_KDUPDATER_RES_NONEED_UPDATE;
+		if (m_list_File.IsNeedUpdate()) {
+			if (m_list_File.m_bNeedRevert)
+				return WMU_KDUPDATER_RES_NEED_REVERT;
+			else
+				return WMU_KDUPDATER_RES_NEED_UPDATE;
+		} else {
+			return 0;
+		}
 	} else if (message == WMU_KDUPDATER_REQ_START_UPDATE) {
 		int iMaxWaitTimes = 60;
 		while (IsWindow((HWND)lParam) && iMaxWaitTimes--)
