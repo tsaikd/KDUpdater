@@ -227,6 +227,15 @@ bool CUPDTListCtrl::IsNeedUpdate(bool bPrepareDL/* = false*/)
 					m_aDLItem.Add(aItem[i]);
 				else
 					RETURN(true);
+			} else if (aItem[i].m_sVersion == pItem->m_sVersion) {
+				if ((!pItem->m_sSha1Hash.IsEmpty()) &&
+					(!aItem[i].m_sSha1Hash.IsEmpty()) &&
+					(aItem[i].m_sSha1Hash != pItem->m_sSha1Hash)) {
+					if (bPrepareDL)
+						m_aDLItem.Add(aItem[i]);
+					else
+						RETURN(true);
+				}
 			}
 			aLocalItem.RemoveAt(j);
 		} else if (aItem[i].m_bOptional != TRUE) {

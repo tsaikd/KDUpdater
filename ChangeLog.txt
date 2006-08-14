@@ -1,3 +1,6 @@
+Version: 1.0.0.6	(2006-08-14)
+	If Version is the same, then compare hash value
+
 Version: 1.0.0.5	(2006-07-12)
 	Fix bug: Can't export hRegWnd to setting file
 
