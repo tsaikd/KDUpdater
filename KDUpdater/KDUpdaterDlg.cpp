@@ -70,7 +70,7 @@ BEGIN_MESSAGE_MAP(CKDUpdaterDlg, CDialog)
 	ON_BN_CLICKED(IDC_UPDT_BTN_REMOVE, &CKDUpdaterDlg::OnBnClickedUpdtBtnRemove)
 	ON_BN_CLICKED(IDC_UPDT_BTN_IMPORT, &CKDUpdaterDlg::OnBnClickedUpdtBtnImport)
 	ON_BN_CLICKED(IDC_UPDT_BTN_EXPORT, &CKDUpdaterDlg::OnBnClickedUpdtBtnExport)
-	ON_BN_CLICKED(IDC_UPDT_BTN_EXPORT, &CKDUpdaterDlg::OnBnClickedUpdtBtnSave)
+	ON_BN_CLICKED(IDC_UPDT_BTN_SAVE, &CKDUpdaterDlg::OnBnClickedUpdtBtnSave)
 	ON_BN_CLICKED(IDC_UPDT_BTN_UPDATE, &CKDUpdaterDlg::OnBnClickedUpdtBtnUpdate)
 	ON_BN_CLICKED(IDC_UPDT_BTN_CHECK, &CKDUpdaterDlg::OnBnClickedUpdtBtnCheck)
 	ON_WM_WINDOWPOSCHANGING()
@@ -161,6 +161,7 @@ void CKDUpdaterDlg::OnBnClickedUpdtBtnSave()
 		return;
 
 	m_list_File.SaveSetting(m_sIniPath);
+	MessageBox(_T("Save Over!"), NULL, MB_OK | MB_ICONINFORMATION);
 }
 
 void CKDUpdaterDlg::OnBnClickedUpdtBtnUpdate()
