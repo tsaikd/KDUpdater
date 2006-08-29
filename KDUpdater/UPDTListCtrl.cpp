@@ -42,15 +42,16 @@ void CUPDTListCtrl::OnDestroy()
 
 bool CUPDTListCtrl::LoadSetting(LPCTSTR lpFilePath)
 {
+	DeleteAllItems();
 	if (!PathFileExists(lpFilePath))
 		return false;
+
 	int i, iCount;
 	CIni ini;
 	CString sListURL;
 	CStringArray saSections;
 	CUPDTListItem *pItem;
 
-	DeleteAllItems();
 	ini.SetPathName(lpFilePath);
 
 	((CKDUpdaterDlg *)GetParent())->m_hRegWnd = (HWND)ini.GetUInt(_T("General"), _T("hRegWnd"), 0);

@@ -1,3 +1,6 @@
+Version: 1.0.0.7	(2006-08-30)
+	Support Save Setting File
+
 Version: 1.0.0.6	(2006-08-14)
 	If Version is the same, then compare hash value
 

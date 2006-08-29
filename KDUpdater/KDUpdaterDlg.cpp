@@ -39,16 +39,27 @@ BOOL CKDUpdaterDlg::OnInitDialog()
 
 	// Process Command Line
 	if (__argc > 1) {
-		m_sIniPath = __targv[1];
+		CString sBuf = __targv[1];
 
-		if (PathFileExists(m_sIniPath)) {
+		if (PathFileExists(sBuf)) {
 			m_bVisiable = false;
 			m_bArgUpdate = true;
-			m_list_File.LoadSetting(m_sIniPath);
+			Import(sBuf);
 		}
 	}
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
+}
+
+void CKDUpdaterDlg::Import(LPCTSTR lpFilePath)
+{
+	if (m_list_File.LoadSetting(lpFilePath)) {
+		m_sIniPath = lpFilePath;
+		GetDlgItem(IDC_UPDT_BTN_SAVE)->EnableWindow();
+	} else {
+		m_sIniPath.Empty();
+		GetDlgItem(IDC_UPDT_BTN_SAVE)->EnableWindow(FALSE);
+	}
 }
 
 BEGIN_MESSAGE_MAP(CKDUpdaterDlg, CDialog)
@@ -59,6 +70,7 @@ BEGIN_MESSAGE_MAP(CKDUpdaterDlg, CDialog)
 	ON_BN_CLICKED(IDC_UPDT_BTN_REMOVE, &CKDUpdaterDlg::OnBnClickedUpdtBtnRemove)
 	ON_BN_CLICKED(IDC_UPDT_BTN_IMPORT, &CKDUpdaterDlg::OnBnClickedUpdtBtnImport)
 	ON_BN_CLICKED(IDC_UPDT_BTN_EXPORT, &CKDUpdaterDlg::OnBnClickedUpdtBtnExport)
+	ON_BN_CLICKED(IDC_UPDT_BTN_EXPORT, &CKDUpdaterDlg::OnBnClickedUpdtBtnSave)
 	ON_BN_CLICKED(IDC_UPDT_BTN_UPDATE, &CKDUpdaterDlg::OnBnClickedUpdtBtnUpdate)
 	ON_BN_CLICKED(IDC_UPDT_BTN_CHECK, &CKDUpdaterDlg::OnBnClickedUpdtBtnCheck)
 	ON_WM_WINDOWPOSCHANGING()
@@ -127,7 +139,7 @@ void CKDUpdaterDlg::OnBnClickedUpdtBtnImport()
 	CFileDialog fDlg(TRUE, _T("ini"), _T("Update"), OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
 		_T("Ini Files (*.ini)|*.ini|All Files (*.*)|*.*||"), this);
 	if (IDOK == fDlg.DoModal())
-		m_list_File.LoadSetting(fDlg.GetPathName());
+		Import(fDlg.GetPathName());
 }
 
 void CKDUpdaterDlg::OnBnClickedUpdtBtnExport()
@@ -139,6 +151,16 @@ void CKDUpdaterDlg::OnBnClickedUpdtBtnExport()
 		_T("Ini Files (*.ini)|*.ini|All Files (*.*)|*.*||"), this);
 	if (IDOK == fDlg.DoModal())
 		m_list_File.SaveSetting(fDlg.GetPathName());
+}
+
+void CKDUpdaterDlg::OnBnClickedUpdtBtnSave()
+{
+	if (!m_list_File.GetItemCount())
+		return;
+	if (m_sIniPath.IsEmpty())
+		return;
+
+	m_list_File.SaveSetting(m_sIniPath);
 }
 
 void CKDUpdaterDlg::OnBnClickedUpdtBtnUpdate()
@@ -195,7 +217,7 @@ void CKDUpdaterDlg::OnDropFiles(HDROP hDropInfo)
 		DragQueryFile(hDropInfo, i, sFilePath, MAX_PATH);
 
 		if (PathFileExists(sFilePath)) {
-			m_list_File.LoadSetting(sFilePath);
+			Import(sFilePath);
 			break;
 		}
 	}
@@ -206,11 +228,10 @@ void CKDUpdaterDlg::OnDropFiles(HDROP hDropInfo)
 LRESULT CKDUpdaterDlg::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	if (message == WMU_KDUPDATER_REQ) {
-		if ((HWND)wParam == m_hRegWnd) {
-			return WMU_KDUPDATER_RES;
-		} else {
+		if (m_hRegWnd && ((HWND)wParam != m_hRegWnd))
 			return 0;
-		}
+
+		return WMU_KDUPDATER_RES;
 	} else if (message == WMU_KDUPDATER_REQ_NEED_UPDATE) {
 		if (m_list_File.IsNeedUpdate()) {
 			if (m_list_File.m_bNeedRevert)

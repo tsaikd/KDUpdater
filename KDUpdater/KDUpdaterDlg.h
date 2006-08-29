@@ -23,6 +23,10 @@ public:
 	enum { IDD = IDD_KDUPDATER_DIALOG };
 	CKDUpdaterDlg(CWnd* pParent = NULL);	// standard constructor
 
+	virtual BOOL OnInitDialog();
+
+	void Import(LPCTSTR lpFilePath);
+
 	CUPDTListCtrl m_list_File;
 	CUPDTEdit m_edit_Version;
 	CUPDTEdit m_edit_FileSize;
@@ -36,7 +40,6 @@ private:
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
-	virtual BOOL OnInitDialog();
 	afx_msg void OnPaint();
 	virtual void OnOK();
 	afx_msg HCURSOR OnQueryDragIcon();
@@ -48,6 +51,7 @@ public:
 	afx_msg void OnBnClickedUpdtBtnRemove();
 	afx_msg void OnBnClickedUpdtBtnImport();
 	afx_msg void OnBnClickedUpdtBtnExport();
+	afx_msg void OnBnClickedUpdtBtnSave();
 	afx_msg void OnBnClickedUpdtBtnUpdate();
 	afx_msg void OnBnClickedUpdtBtnCheck();
 	afx_msg void OnWindowPosChanging(WINDOWPOS* lpwndpos);
