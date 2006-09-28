@@ -1,3 +1,6 @@
+Version: 1.0.0.8	(2006-09-28)
+	Fix bug: Post Command will lost
+
 Version: 1.0.0.7	(2006-08-30)
 	Support Save Setting File
 

@@ -257,10 +257,7 @@ LRESULT CKDUpdaterDlg::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	switch (message) {
 	case KDUPM_UPDATEOVER:
 		if (m_bArgUpdate) {
-			CString sPostCmd;
-			CIni ini;
-			ini.SetPathName(m_sIniPath);
-			sPostCmd = ini.GetString(_T("General"), _T("sPostCmd"));
+			CString sPostCmd = m_list_File.m_sPostCmd;
 			if (!sPostCmd.IsEmpty())
 				ShellExecute(NULL, _T("open"), sPostCmd, NULL, NULL, SW_SHOW);
 

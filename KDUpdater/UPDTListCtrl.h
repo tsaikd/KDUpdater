@@ -42,6 +42,7 @@ public:
 	inline bool IsDownloadFailed() { return m_bDownloadFailed; }
 
 	bool	m_bNeedRevert;
+	CString	m_sPostCmd;
 
 private:
 	static BOOL CALLBACK QueryOtherKDUpdater(HWND hWnd, LPARAM lParam);
@@ -54,7 +55,6 @@ private:
 	// Hide information
 	UINT	m_uhRegWnd;
 	CString	m_sWorkDir;
-	CString	m_sPostCmd;
 
 public:
 	afx_msg void OnDestroy();
